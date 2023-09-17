@@ -65,3 +65,18 @@ func (repository UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, lea
 
 	return nil
 }
+
+func (repository UserRepositoryImpl) GetByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error) {
+	querySQL := "SELECT id, name, email, password FROM users WHERE email = ?"
+	row, err := tx.QueryContext(ctx, querySQL, email)
+	helpers.PanicIfError(err)
+
+	var user domain.User
+
+	if row.Next() {
+		err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+		helpers.PanicIfError(err)
+	}
+
+	return user, nil
+}

@@ -8,6 +8,8 @@ import (
 	"Rental_Mobil/repository/users"
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -51,7 +53,32 @@ func (service UserServiceImpl) Get(ctx context.Context, userId int) dto.UserResp
 	return user.ToDtoResponse()
 }
 
+func (service UserServiceImpl) GetByEmail(ctx context.Context, request web.LoginRequest) dto.UserResponse {
+	err := service.validate.Struct(request)
+	helpers.PanicIfError(err)
+
+	tx, err := service.DB.Begin()
+	helpers.PanicIfError(err)
+
+	defer helpers.CommitOrRollback(tx)
+
+	user, err := service.UserRepository.GetByEmail(ctx, tx, request.Email)
+	helpers.PanicIfError(err)
+
+	fmt.Println(user)
+
+	ok := helpers.CheckPasswordHash(request.Password, user.Password)
+	if !ok {
+		helpers.PanicIfError(errors.New("email atau password salah"))
+	}
+
+	return user.ToDtoResponse()
+}
+
 func (service UserServiceImpl) Create(ctx context.Context, request web.UserRequest) error {
+	err := service.validate.Struct(request)
+	helpers.PanicIfError(err)
+
 	tx, err := service.DB.Begin()
 	helpers.PanicIfError(err)
 

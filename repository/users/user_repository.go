@@ -12,4 +12,5 @@ type UserRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, user domain.User) error
 	Update(ctx context.Context, tx *sql.Tx, userId int, user domain.User) error
 	Delete(ctx context.Context, tx *sql.Tx, userId int) error
+	GetByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error)
 }
