@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"Rental_Mobil/model/web"
+	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
@@ -22,7 +24,13 @@ func JWTMiddleware(next httprouter.Handle) httprouter.Handle {
 		})
 
 		if err != nil || !token.Valid {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			response := web.FormatResponse{
+				Code:   http.StatusUnauthorized,
+				Status: "Unauthorized",
+			}
+
+			encode := json.NewEncoder(w)
+			err = encode.Encode(&response)
 			return
 		}
 
