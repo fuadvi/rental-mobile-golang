@@ -5,7 +5,7 @@ import (
 	"context"
 )
 
-type leaseTypeService interface {
+type LeaseTypeService interface {
 	GetList(ctx context.Context) []dto.LeaseTypeResponseDto
 	GET(ctx context.Context, leaseTypeId int) dto.LeaseTypeResponseDto
 	Create(ctx context.Context, request dto.LeaseTypeRequest) error

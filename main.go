@@ -6,7 +6,9 @@ import (
 	"Rental_Mobil/exception"
 	"Rental_Mobil/helpers"
 	"Rental_Mobil/middleware"
+	"Rental_Mobil/repository/lease_types"
 	"Rental_Mobil/repository/users"
+	"Rental_Mobil/service/leaseType"
 	"Rental_Mobil/service/user"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
@@ -24,6 +26,14 @@ func main() {
 
 	router.POST("/api/register", middleware.JWTMiddleware(authController.Register))
 	router.POST("/api/login", authController.Login)
+
+	// lease  type
+	leaseTypeRepo := lease_types.NewLeaseTypeRepositoryImpl()
+	leaseTypeService := leaseType.NewLeaseTypeServiceImpl(leaseTypeRepo, db, validate)
+	leaseTypeController := controller.NewLeaseTypeControllerImpl(leaseTypeService)
+	router.GET("/api/lease-type", middleware.JWTMiddleware(leaseTypeController.ListLeaseType))
+	router.POST("/api/lease-type", middleware.JWTMiddleware(leaseTypeController.CreateLeaseType))
+	router.GET("/api/lease-type/:id", middleware.JWTMiddleware(leaseTypeController.GetLeaseType))
 
 	router.PanicHandler = exception.ErrorHandler
 	server := &http.Server{
