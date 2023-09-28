@@ -78,11 +78,46 @@ func (controller LeaseTypeControllerImpl) CreateLeaseType(write http.ResponseWri
 }
 
 func (controller LeaseTypeControllerImpl) UpdateLeaseType(write http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	//TODO implement me
-	panic("implement me")
+	leaseTypeId := params.ByName("id")
+	id, err := strconv.Atoi(leaseTypeId)
+	helpers.PanicIfError(err)
+
+	var leaseTypeRequest dto.LeaseTypeRequest
+	decode := json.NewDecoder(request.Body)
+	err = decode.Decode(&leaseTypeRequest)
+	helpers.PanicIfError(err)
+
+	err = controller.leaseTypeService.Update(context.Background(), leaseTypeRequest, id)
+	helpers.PanicIfError(err)
+
+	response := web.FormatResponse{
+		Code:   http.StatusOK,
+		Status: "ok",
+		Data:   "Success Update Lease Type",
+	}
+
+	write.Header().Add("Content-Type", "application/json")
+	encode := json.NewEncoder(write)
+	err = encode.Encode(&response)
+	helpers.PanicIfError(err)
 }
 
 func (controller LeaseTypeControllerImpl) DeleteLeaseType(write http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	//TODO implement me
-	panic("implement me")
+	leaseTypeId := params.ByName("id")
+	id, err := strconv.Atoi(leaseTypeId)
+	helpers.PanicIfError(err)
+
+	err = controller.leaseTypeService.Delete(context.Background(), id)
+	helpers.PanicIfError(err)
+
+	response := web.FormatResponse{
+		Code:   http.StatusOK,
+		Status: "ok",
+		Data:   "Success Delete Lease Type",
+	}
+
+	write.Header().Add("Content-Type", "application/json")
+	encode := json.NewEncoder(write)
+	err = encode.Encode(&response)
+	helpers.PanicIfError(err)
 }

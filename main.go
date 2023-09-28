@@ -34,6 +34,8 @@ func main() {
 	router.GET("/api/lease-type", middleware.JWTMiddleware(leaseTypeController.ListLeaseType))
 	router.POST("/api/lease-type", middleware.JWTMiddleware(leaseTypeController.CreateLeaseType))
 	router.GET("/api/lease-type/:id", middleware.JWTMiddleware(leaseTypeController.GetLeaseType))
+	router.PUT("/api/lease-type/:id", middleware.JWTMiddleware(leaseTypeController.UpdateLeaseType))
+	router.DELETE("/api/lease-type/:id", middleware.JWTMiddleware(leaseTypeController.DeleteLeaseType))
 
 	router.PanicHandler = exception.ErrorHandler
 	server := &http.Server{
