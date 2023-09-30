@@ -6,3 +6,11 @@ type TourRequestDto struct {
 	Duration    string `json:"duration" validate:"required"`
 	Description string `json:"description" validate:"required,number"`
 }
+
+type TourResponseDto struct {
+	Id          int    `json:"id"`
+	Title       string `json:"title"`
+	Price       int    `json:"price"`
+	Duration    string `json:"duration"`
+	Description string `json:"description"`
+}
