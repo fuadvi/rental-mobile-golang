@@ -6,8 +6,10 @@ import (
 	"Rental_Mobil/exception"
 	"Rental_Mobil/helpers"
 	"Rental_Mobil/middleware"
+	"Rental_Mobil/repository/Tour"
 	"Rental_Mobil/repository/lease_types"
 	"Rental_Mobil/repository/users"
+	Tour2 "Rental_Mobil/service/Tour"
 	"Rental_Mobil/service/leaseType"
 	"Rental_Mobil/service/user"
 	"github.com/go-playground/validator/v10"
@@ -36,6 +38,16 @@ func main() {
 	router.GET("/api/lease-type/:id", middleware.JWTMiddleware(leaseTypeController.GetLeaseType))
 	router.PUT("/api/lease-type/:id", middleware.JWTMiddleware(leaseTypeController.UpdateLeaseType))
 	router.DELETE("/api/lease-type/:id", middleware.JWTMiddleware(leaseTypeController.DeleteLeaseType))
+
+	tourRepo := Tour.NewTourRepositoryImpl()
+	tourService := Tour2.NewTourServiceImp(tourRepo, db, validate)
+	tourController := controller.NewTourControllerImpl(tourService)
+
+	router.GET("/api/tours", middleware.JWTMiddleware(tourController.GetAll))
+	router.GET("/api/tours/:id", middleware.JWTMiddleware(tourController.Get))
+	router.POST("/api/tours", middleware.JWTMiddleware(tourController.Create))
+	router.PUT("/api/tours/:id", middleware.JWTMiddleware(tourController.Update))
+	router.DELETE("/api/tours/:id", middleware.JWTMiddleware(tourController.Delete))
 
 	router.PanicHandler = exception.ErrorHandler
 	server := &http.Server{

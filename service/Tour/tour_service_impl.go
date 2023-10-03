@@ -16,10 +16,14 @@ type TourServiceImp struct {
 	validate *validator.Validate
 }
 
+func NewTourServiceImp(tourRepo Tour.TourRepository, DB *sql.DB, validate *validator.Validate) *TourServiceImp {
+	return &TourServiceImp{TourRepo: tourRepo, DB: DB, validate: validate}
+}
+
 func (service TourServiceImp) GetAll(ctx context.Context) []dto.TourResponseDto {
 	tx, err := service.DB.Begin()
 	helpers.PanicIfError(err)
-	helpers.CommitOrRollback(tx)
+	defer helpers.CommitOrRollback(tx)
 
 	tours := service.TourRepo.GetAll(context.Background(), tx)
 
@@ -36,7 +40,7 @@ func (service TourServiceImp) GetAll(ctx context.Context) []dto.TourResponseDto 
 func (service TourServiceImp) Get(ctx context.Context, tourId int) dto.TourResponseDto {
 	tx, err := service.DB.Begin()
 	helpers.PanicIfError(err)
-	helpers.CommitOrRollback(tx)
+	defer helpers.CommitOrRollback(tx)
 
 	tour, err := service.TourRepo.Get(context.Background(), tx, tourId)
 
@@ -53,7 +57,7 @@ func (service TourServiceImp) Create(ctx context.Context, request dto.TourReques
 
 	tx, err := service.DB.Begin()
 	helpers.PanicIfError(err)
-	helpers.CommitOrRollback(tx)
+	defer helpers.CommitOrRollback(tx)
 
 	err = service.TourRepo.Create(context.Background(), tx, request)
 	helpers.PanicIfError(err)
@@ -67,7 +71,7 @@ func (service TourServiceImp) Update(ctx context.Context, request dto.TourReques
 
 	tx, err := service.DB.Begin()
 	helpers.PanicIfError(err)
-	helpers.CommitOrRollback(tx)
+	defer helpers.CommitOrRollback(tx)
 
 	err = service.TourRepo.Update(context.Background(), tx, request, tourId)
 	helpers.PanicIfError(err)
@@ -78,7 +82,7 @@ func (service TourServiceImp) Update(ctx context.Context, request dto.TourReques
 func (service TourServiceImp) Delete(ctx context.Context, tourId int) error {
 	tx, err := service.DB.Begin()
 	helpers.PanicIfError(err)
-	helpers.CommitOrRollback(tx)
+	defer helpers.CommitOrRollback(tx)
 
 	err = service.TourRepo.Delete(context.Background(), tx, tourId)
 	helpers.PanicIfError(err)

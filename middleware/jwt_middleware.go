@@ -24,6 +24,7 @@ func JWTMiddleware(next httprouter.Handle) httprouter.Handle {
 		})
 
 		if err != nil || !token.Valid {
+			w.Header().Add("Content-Type", "application/json")
 			response := web.FormatResponse{
 				Code:   http.StatusUnauthorized,
 				Status: "Unauthorized",
