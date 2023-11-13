@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -24,7 +23,6 @@ func NewLeaseTypeControllerImpl(leaseTypeService leaseType.LeaseTypeService) *Le
 func (controller LeaseTypeControllerImpl) ListLeaseType(write http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
 	listTypes := controller.leaseTypeService.GetList(context.Background())
-	log.Println(listTypes)
 
 	write.Header().Add("Content-Type", "application-json")
 	response := web.FormatResponse{

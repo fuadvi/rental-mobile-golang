@@ -16,16 +16,19 @@ func NewCarRepositoryImpl() *CarRepositoryImpl {
 	return &CarRepositoryImpl{}
 }
 
-func (repository CarRepositoryImpl) GetAll(ctx context.Context, tx *sql.Tx) []domain.Car {
-	querySql := "SELECT id, title, price, duration, image_url, description, passenger, luggage, car_type, is_driver FROM cars"
+func (repository CarRepositoryImpl) GetAll(ctx context.Context, tx *sql.Tx) []dto.CarResponseDto {
+	querySql := "SELECT c.id, c.title, c.price, c.duration, c.image_url, c.description, c.passenger, c.luggage, c.car_type, c.is_driver, lt.title FROM cars c " +
+		"join car_lease_type clt on c.id = clt.car_id " +
+		"join lease_types lt on clt.lease_type_id = lt.id"
+
 	rows, err := tx.QueryContext(ctx, querySql)
 	helpers.PanicIfError(err)
 
-	var cars []domain.Car
+	var cars []dto.CarResponseDto
 	for rows.Next() {
-		var car domain.Car
+		var car dto.CarResponseDto
 
-		err := rows.Scan(&car.ID, &car.TITLE, &car.PRICE, &car.DURATION, &car.IMGURL, &car.PASSENGER, &car.LUGGAGE, &car.CARTYPE, &car.ISDRIVER)
+		err := rows.Scan(&car.ID, &car.TITLE, &car.PRICE, &car.DURATION, &car.IMGURL, &car.PASSENGER, &car.LUGGAGE, &car.CARTYPE, &car.ISDRIVER, &car.LEASETYPE)
 		helpers.PanicIfError(err)
 
 		cars = append(cars, car)
@@ -41,7 +44,7 @@ func (repository CarRepositoryImpl) Get(ctx context.Context, tx *sql.Tx, carId i
 
 	var car domain.Car
 	if row.Next() {
-		err := row.Scan(&car.ID, &car.TITLE, &car.PRICE, &car.DURATION, &car.IMGURL, &car.PASSENGER, &car.LUGGAGE, &car.CARTYPE, &car.ISDRIVER)
+		err := row.Scan(&car.ID, &car.TITLE, &car.PRICE, &car.DURATION, &car.IMGURL, &car.DESCRIPTION, &car.PASSENGER, &car.LUGGAGE, &car.CARTYPE, &car.ISDRIVER)
 		helpers.PanicIfError(err)
 	} else {
 		return car, errors.New("Not Found")
@@ -72,5 +75,12 @@ func (repository CarRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, carI
 	_, err := tx.ExecContext(ctx, querySql, carId)
 	helpers.PanicIfError(err)
 
+	return nil
+}
+
+func (repository CarRepositoryImpl) CarLeaseTypeCreate(ctx context.Context, tx *sql.Tx, leaseTypeId int, carId int) error {
+	querySql := "INSERT INTO car_lease_type (lease_type_id, car_id) VALUES (?,?)"
+	_, err := tx.ExecContext(ctx, querySql, leaseTypeId, carId)
+	helpers.PanicIfError(err)
 	return nil
 }

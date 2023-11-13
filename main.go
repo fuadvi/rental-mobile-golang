@@ -7,8 +7,10 @@ import (
 	"Rental_Mobil/helpers"
 	"Rental_Mobil/middleware"
 	"Rental_Mobil/repository/Tour"
+	"Rental_Mobil/repository/cars"
 	"Rental_Mobil/repository/lease_types"
 	"Rental_Mobil/repository/users"
+	"Rental_Mobil/service/Car"
 	Tour2 "Rental_Mobil/service/Tour"
 	"Rental_Mobil/service/leaseType"
 	"Rental_Mobil/service/user"
@@ -48,6 +50,14 @@ func main() {
 	router.POST("/api/tours", middleware.JWTMiddleware(tourController.Create))
 	router.PUT("/api/tours/:id", middleware.JWTMiddleware(tourController.Update))
 	router.DELETE("/api/tours/:id", middleware.JWTMiddleware(tourController.Delete))
+
+	carRepo := cars.NewCarRepositoryImpl()
+	carService := Car.NewCarServiceImpl(carRepo, db, validate)
+	carController := controller.NewCarControllerImpl(carService)
+
+	router.GET("/api/cars", middleware.JWTMiddleware(carController.GetAll))
+	router.GET("/api/cars/:id", middleware.JWTMiddleware(carController.Get))
+	router.POST("/api/cars", middleware.JWTMiddleware(carController.Create))
 
 	router.PanicHandler = exception.ErrorHandler
 	server := &http.Server{
