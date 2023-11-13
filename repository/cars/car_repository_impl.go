@@ -17,7 +17,7 @@ func NewCarRepositoryImpl() *CarRepositoryImpl {
 }
 
 func (repository CarRepositoryImpl) GetAll(ctx context.Context, tx *sql.Tx) []dto.CarResponseDto {
-	querySql := "SELECT c.id, c.title, c.price, c.duration, c.image_url, c.description, c.passenger, c.luggage, c.car_type, c.is_driver, lt.title FROM cars c " +
+	querySql := "SELECT c.id, c.title, c.price, c.duration, c.image_url, c.description, c.passenger, c.luggage, c.car_type, c.is_driver, lt.id FROM cars c " +
 		"join car_lease_type clt on c.id = clt.car_id " +
 		"join lease_types lt on clt.lease_type_id = lt.id"
 
@@ -28,7 +28,7 @@ func (repository CarRepositoryImpl) GetAll(ctx context.Context, tx *sql.Tx) []dt
 	for rows.Next() {
 		var car dto.CarResponseDto
 
-		err := rows.Scan(&car.ID, &car.TITLE, &car.PRICE, &car.DURATION, &car.IMGURL, &car.PASSENGER, &car.LUGGAGE, &car.CARTYPE, &car.ISDRIVER, &car.LEASETYPE)
+		err := rows.Scan(&car.ID, &car.TITLE, &car.PRICE, &car.DURATION, &car.IMGURL, &car.DESCRIPTION, &car.PASSENGER, &car.LUGGAGE, &car.CARTYPE, &car.ISDRIVER, &car.LEASETYPE)
 		helpers.PanicIfError(err)
 
 		cars = append(cars, car)
@@ -65,8 +65,8 @@ func (repository CarRepositoryImpl) Create(ctx context.Context, tx *sql.Tx, requ
 }
 
 func (repository CarRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, request dto.CarRequestDto, carId int) {
-	querySql := "update cars set title = ?, price = ?, duration = ?, image_url = ?, description = ?, passenger = ?, luggage = ?, car_type = ?, is_drive = ? where id = ?"
-	_, err := tx.ExecContext(ctx, querySql, request.TITLE, request.PRICE, request.DURATION, request.IMGURL, request.DESCRIPTION, request.PASSENGER, request.LUGGAGE, request.CARTYPE, request.ISDRIVER)
+	querySql := "update cars set title = ?, price = ?, duration = ?, image_url = ?, description = ?, passenger = ?, luggage = ?, car_type = ?, is_driver = ? where id = ?"
+	_, err := tx.ExecContext(ctx, querySql, request.TITLE, request.PRICE, request.DURATION, request.IMGURL, request.DESCRIPTION, request.PASSENGER, request.LUGGAGE, request.CARTYPE, request.ISDRIVER, carId)
 	helpers.PanicIfError(err)
 }
 

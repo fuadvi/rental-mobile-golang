@@ -58,6 +58,8 @@ func main() {
 	router.GET("/api/cars", middleware.JWTMiddleware(carController.GetAll))
 	router.GET("/api/cars/:id", middleware.JWTMiddleware(carController.Get))
 	router.POST("/api/cars", middleware.JWTMiddleware(carController.Create))
+	router.PUT("/api/cars/:id", middleware.JWTMiddleware(carController.Update))
+	router.DELETE("/api/cars/:id", middleware.JWTMiddleware(carController.Delete))
 
 	router.PanicHandler = exception.ErrorHandler
 	server := &http.Server{

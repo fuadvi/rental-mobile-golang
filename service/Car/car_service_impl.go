@@ -54,17 +54,26 @@ func (service CarServiceImpl) Create(ctx context.Context, request dto.CarRequest
 	helpers.PanicIfError(err)
 
 	// insert data ke table car lease type
-
 	err = service.carRepo.CarLeaseTypeCreate(ctx, tx, request.LEASETYPEID, carId)
 
 }
 
 func (service CarServiceImpl) Update(ctx context.Context, request dto.CarRequestDto, carId int) {
-	//TODO implement me
-	panic("implement me")
+	err := service.validate.Struct(request)
+	helpers.PanicIfError(err)
+
+	tx, err := service.db.Begin()
+	helpers.PanicIfError(err)
+	defer helpers.CommitOrRollback(tx)
+
+	service.carRepo.Update(ctx, tx, request, carId)
 }
 
 func (service CarServiceImpl) Delete(ctx context.Context, carId int) {
-	//TODO implement me
-	panic("implement me")
+	tx, err := service.db.Begin()
+	helpers.PanicIfError(err)
+	defer helpers.CommitOrRollback(tx)
+
+	err = service.carRepo.Delete(ctx, tx, carId)
+	helpers.PanicIfError(err)
 }

@@ -76,11 +76,45 @@ func (controller CarControllerImpl) Get(write http.ResponseWriter, request *http
 }
 
 func (controller CarControllerImpl) Update(write http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	//TODO implement me
-	panic("implement me")
+	id := params.ByName("id")
+	cardId, err := strconv.Atoi(id)
+	helpers.PanicIfError(err)
+
+	var requestData dto.CarRequestDto
+	decode := json.NewDecoder(request.Body)
+	err = decode.Decode(&requestData)
+	helpers.PanicIfError(err)
+
+	controller.carService.Update(context.Background(), requestData, cardId)
+
+	response := web.FormatResponse{
+		Code:   200,
+		Status: "Ok",
+		Data:   nil,
+	}
+
+	write.Header().Add("Content-Type", "application/json")
+	encoder := json.NewEncoder(write)
+	err = encoder.Encode(&response)
+	helpers.PanicIfError(err)
+
 }
 
 func (controller CarControllerImpl) Delete(write http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	//TODO implement me
-	panic("implement me")
+	id := params.ByName("id")
+	cardId, err := strconv.Atoi(id)
+	helpers.PanicIfError(err)
+
+	controller.carService.Delete(context.Background(), cardId)
+
+	response := web.FormatResponse{
+		Code:   200,
+		Status: "Ok",
+		Data:   nil,
+	}
+
+	write.Header().Add("Content-Type", "application/json")
+	encoder := json.NewEncoder(write)
+	err = encoder.Encode(&response)
+	helpers.PanicIfError(err)
 }
